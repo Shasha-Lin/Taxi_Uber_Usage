@@ -17,20 +17,20 @@ Trips per Day and Trips per Month
 
 The following pyspark code should be run using an HPC cluster such as NYU's Dumbo cluster:
 
-by_date_pickup_fhv.py . 
-by_date_pickup_green.py . 
-by_date_pickup_yellow.py . 
++by_date_pickup_fhv.py 
++by_date_pickup_green.py 
++by_date_pickup_yellow.py 
 
 Run using the commands:  
-spark-submit by_date_pickup_fhv.py . 
-spark-submit by_date_pickup_green.py . 
-spark-submit by_date_pickup_yellow.py . 
+spark-submit by_date_pickup_fhv.py 
+spark-submit by_date_pickup_green.py 
+spark-submit by_date_pickup_yellow.py 
 
 This produces the following output files:  
 
-by_date_pickup_fhv.out . 
-by_date_pickup_yellow.out . 
-by_date_pickup_green.out . 
+by_date_pickup_fhv.out 
+by_date_pickup_yellow.out 
+by_date_pickup_green.out 
 
 Place each output file with the name unchanged in the same directory as the following visualization code:  
 
