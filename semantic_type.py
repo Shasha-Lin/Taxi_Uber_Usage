@@ -1,3 +1,33 @@
+def base_type(any_string):
+    #Check to see if it's a datetime
+    date = re.compile('\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}')
+    date_match = date.match(any_string)
+    if date_match:
+        return 'Datetime'
+    else:
+    
+        #Check to see if it's a decimal
+        decimal = re.compile('^-?\d*\.[0-9]{1,6}')
+        decimal_match = decimal.match(any_string)
+        if decimal_match:
+            return 'Decimal'
+        else:
+    
+            #Check to see if it's an integer
+            integer = re.compile('^-?[0-9]+$')
+            integer_match = integer.match(any_string)
+            if integer_match and '.' not in any_string:
+                return 'Integer'
+            else:
+    
+                #Check to see if it's a character
+                character = re.compile('^[a-zA-Z]+$')
+                character_match = character.match(any_string)
+                if character_match:
+                    return 'Character'
+                else:
+                    return 'Unknown'
+
 def semantic_type(any_string):
     types = \
     pd.Series(index = ['PO/DO Datetime', 'Lat/Long', 'Currency', 'Distance', 'LowID', 'LocationID', 'Count', 'Flag'])
@@ -20,24 +50,24 @@ def semantic_type(any_string):
     if decimal2_match:
         types['Currency'] = 1
         types['Distance'] = 1
-    try:
-        #Check to see if it's a positive integer (no maximum value)
-        if int(any_string) == float(any_string) and int(any_string) > 0:
-            types['Currency'] = 1
-            types['Distance'] = 1
-            types['Count'] = 1
-            if int(any_string) in range(1,7): #Many ID fields range from 1 to 6
-                types['LowID'] = 1
-            if int(any_string) in range(1,266): #Location ID ranges from 1 to 265
-                types['LocationID'] = 1
-    #error handling for strings that can't be converted to integer or float
-    except TypeError:
-        pass
-    except ValueError:
-        pass
+        
+    #Check to see if it's an integer
+    if base_type(any_string) == 'Integer':
+        types['Count'] = 1
+        if int(any_string) in range(1,7): #Many ID fields range from 1 to 6
+            types['LowID'] = 1
+        if int(any_string) in range(1,266): #Location ID ranges from 1 to 265
+            types['LocationID'] = 1
+            
+    #Check to see if it's a Y or N
+    if base_type(any_string) == 'Character':
+        if any_string == 'Y' or any_string == 'N':
+            types['Flag'] = 1
+
     #if doesn't match any types in our data return none
     if types.loc[types.notnull()==True].index.tolist() == []:
         return 'None'
     #else return a list of the types that match
     else:
         return ", ".join(types.loc[types.notnull()==True].index.tolist())
+        
