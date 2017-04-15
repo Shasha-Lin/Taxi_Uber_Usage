@@ -4,6 +4,8 @@ from operator import add
 from pyspark import SparkContext
 from csv import reader
 
+'''Run using command spark-submit by_date_pickup_green.py'''
+
 if __name__ == "__main__":
     sc = SparkContext()
     lines = sc.textFile('new_schema/green_*.csv,old_schema/green_*.csv')
@@ -14,5 +16,3 @@ if __name__ == "__main__":
     counts.saveAsTextFile('by_date_pickup_green.out')
 
     sc.stop()
-
-
