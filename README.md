@@ -65,14 +65,11 @@ The following pyspark code should be run using an HPC cluster such as NYU's Dumb
 
 + by_location.py
 
-Run using the commands:  
-+ spark-submit by_location.py
+Run using the command: spark-submit by_location.py
 
-This produces the following output files:  
+This produces the output file by_borough.out.
 
-+ by_borough.out
-
-Place each output file with the name unchanged in the same directory as the following visualization code:  
+Place the output file with the name unchanged in the same directory as the following visualization code:  
 
 by_borough_viz.py
 
