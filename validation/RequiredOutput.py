@@ -6,43 +6,47 @@ from pyspark import SparkContext
 from datetime import datetime
 #import numpy as np
 import sys
+from glob import glob
 sc = SparkContext()
 sc.addFile('common_functions.py')
 from common_functions import *
 
 """This script outputs 3 things for each column: base type, semantic type, valid/invalid/null
-
-This script should be applied to columns: VendorID, Passenger_count, Pickup_longitude, 
-Pickup_latitude, Dropoff_longitude, Dropoff_latitude, 
-Payment_type, Fare_amount, Extra, MTA_tax, 
-Tip_amount, Tolls_amount, improvement_surcharge, Total_amount, Ehail_fee
-
+To run:
+spark-submit RequiredOutput.py <file> <column> <output directory>\n
+file should be any monthly green/yellow cab data files\n
+between 2015-01 and 2016-12\n
+column should be the exact name of the columnof interest: e.g. Pickup_longitude \n
+output directory is where you would like to see your output in the hdfs: e.g. user/sl4964
 """
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("Usage: RequiredOutput <file> <column> <output directory>\n file should be any green/yellow cab tables between 2015 Jan and 2016 June \n\
-            column should be the name of the columnof interest: e.g. Pickup_longitude \n\
+        print("Usage: spark-submit RequiredOutput.py <file> <column> <output directory>\n file should be any monthly green/yellow cab data files\n\
+            between 2015-01 and 2016-12\n\
+            column should be the exact name of the columnof interest: e.g. Pickup_longitude \n\
             output directory is where you would like to see your output in the hdfs: e.g. user/sl4964", file=sys.stderr)
         exit(-1)
 
     current_module = sys.modules[__name__] #used to fetch the correct function
+    #all possible columns, in lower case
     column_list = ['vendorid', 'passenger_count', 'pickup_longitude', 
     'pickup_latitude', 'dropoff_longitude', 'dropoff_latitude', 'ratecodeid', 
     'fare_amount', 'extra', 'mta_tax', 'payment_type',  'store_and_fwd_flag', 
     'tip_amount', 'tolls_amount', 'improvement_surcharge', 'total_amount', 'ehail_fee', 'trip_type']
 
-    
+    #files = glob(sys.argv[1])
+    #if len(files) == 1
     watershed = datetime(2016, 7, 5, 0, 0)
     #In and after 2016-07, file schema changed. The day 5 is arbitrary, and should not matter. 
-    yg = sys.argv[1].split('_')[0]
-    month = sys.argv[1].split('_')[-1].split('.')[0].split('-')
+    yg = sys.argv[1].split('/')[-1].split('_')[0]
+    month = sys.argv[1].split('/')[-1].split('_')[-1].split('.')[0].split('-')
     file_time = file = datetime(int(month[0]), int(month[1]), 5)
     #Use different dictionary for data files with different schemas.
     if yg == 'green':
         if file_time < watershed:
             column_dictionary = {'VendorID': 0, 'Pickup_longitude': 5, 'Pickup_latitude': 6, 'Dropoff_longitude': 7, 'Dropoff_latitude': 8, 
-            'Passenger_count': 9, 'Fare_amount': 11, 'Extra', 12, 'MTA_tax', 13, 'Tip_amount': 14, 'Tolls_amount':15, 'Ehail_fee':16, 
+            'Passenger_count': 9, 'Fare_amount': 11, 'Extra': 12, 'MTA_tax': 13, 'Tip_amount': 14, 'Tolls_amount':15, 'Ehail_fee':16, 
             'improvement_surcharge':17, 'Total_amount': 18, 'Payment_type': 19, 'Trip_type':20, 'RateCodeID': 4, 'Store_and_fwd_flag': 3}
         else:
             column_dictionary = {'VendorID': 0, 'lpep_pickup_datetime': 1, 'lpep_dropoff_datetime': 2, 'Store_and_fwd_flag':3, 
@@ -70,27 +74,27 @@ if __name__ == "__main__":
         try:
         	output[0] = float(output[0])
         except ValueError:
-        	output[2] = 'INVALID'
+        	output[-1] = 'INVALID'
         if output[0] == 0:
-            output[2] = 'NULL'
+            output[-1] = 'NULL'
         elif output[0]  < -75 or output[0]  > -71:
-        	output[2] = 'INVALID'
+        	output[-1] = 'INVALID'
         else:
-        	output[2] = 'VALID'
+        	output[-1] = 'VALID'
         return output
 
     def pickup_latitude(output):
         """generates output for Pickup_latitude"""
-		try:
+        try:
         	output[0] = float(output[0])
         except ValueError:
-        	output[2] = 'INVALID'
+        	output[-1] = 'INVALID'
         if output[0] == 0:
-            output[2] = 'NULL'
+            output[-1] = 'NULL'
         elif output[0] < 39.5 or output[0] > 43:
-        	output[2] = 'INVALID'
+        	output[-1] = 'INVALID'
         else:
-        	output[2] = 'VALID'
+        	output[-1] = 'VALID'
         return output
 
     def dropoff_longitude(output):
@@ -106,24 +110,24 @@ if __name__ == "__main__":
     	try:
     		output[0] = int(output[0])
     	except:
-    		output[2] = 'NULL'
+    		output[-1] = 'NULL'
     	if output[0] in [1, 2]:
-    		output[2] = 'VALID'
+    		output[-1] = 'VALID'
     	else:
-			output[2] = 'INVALID'
-		return output 
+			output[-1] = 'INVALID'
+        return output 
 
 	def passenger_count(output, rang = range(1, 10)):
 		'''generates output for Passenger_count'''
 		try:
-    		output[0] = int(output[0])
-    	except:
-    		output[2] = 'NULL'
-    	if output[0] in rang:
-    		output[2] = 'VALID'
-    	else:
-    		output[2] = 'INVALID'
-    	return output
+			output[0] = int(output[0])
+		except:
+			output[-1] = 'NULL'
+		if output[0] in rang:
+			output[-1] = 'VALID'
+		else:
+			output[-1] = 'INVALID'
+		return output
 
     def payment_type(output):
 		'''generates output for Payment_type'''
@@ -135,28 +139,28 @@ if __name__ == "__main__":
     		output[0] = float(output[0])
     	except:
     		if output[0] in missing:
-    			output[2] = 'NULL'
+    			output[-1] = 'NULL'
     		else:
-    			output[2] = 'INVALID'
+    			output[-1] = 'INVALID'
     	if output[0] < 0:
-    		output[2] = 'INVALID'
+    		output[-1] = 'INVALID'
     	else:
-    		output[2] = 'VALID'
+    		output[-1] = 'VALID'
     	return output
 
-    def extra(output[0], values = [.5, 1.0]):
+    def extra(output, values = [.5, 1.0]):
     	'''generates output for Extra'''
     	try:
     		output[0] = float(output[0])
     	except:
     		if output[0] in missing:
-    			output[2] = 'NULL'
+    			output[-1] = 'NULL'
     		else:
-    			output[2] = 'INVALID'
+    			output[-1] = 'INVALID'
     	if output[0] not in values:
-    		output[2] = 'INVALID'
+    		output[-1] = 'INVALID'
     	else:
-    		output[2] = 'VALID'
+    		output[-1] = 'VALID'
     	return output
 
     def mta_tax(output):
@@ -168,7 +172,7 @@ if __name__ == "__main__":
     def tip_amount(output):
     	return Fare_amount(output)
 
-    def trip_type(output)
+    def trip_type(output):
     	return Passenger_count(output, rang = range(1, 3))
 
     def ehail_fee(output):
@@ -182,31 +186,31 @@ if __name__ == "__main__":
 
     def store_and_fwd_flag(output):
     	if output[0] in missing:
-    		output[2] = 'NULL'
+    		output[-1] = 'NULL'
     	elif output[0] in ('Y', 'N'):
-    		output[2] = 'VALID'
+    		output[-1] = 'VALID'
     	else:
-    		output[2] = 'INVALID'
+    		output[-1] = 'INVALID'
     	return output
 
     def ratecodeid(output):
-		if (output[0] in missing) or (output[0] in ratecodeid_missing):
-			output[2] = 'NULL'
-		try:
-			output[0] = float(output[0])
-		except:
-			output[2] = 'INVALID'
-		if output[0] in range(1, 7):
-			output[2] = 'VALID'
+    	if (output[0] in missing) or (output[0] in ratecodeid_missing):
+    		output[-1] = 'NULL'
+    	try:
+    		output[0] = float(output[0])
+    	except:
+    		output[-1] = 'INVALID'
+    	if output[0] in range(1, 7):
+    		output[-1] = 'VALID'
     	else:
-    		output[2] = 'INVALID'
+    		output[-1] = 'INVALID'
+        return output
 
 
     output = taxi_data.mapPartitions(lambda x: reader(x)).map(lambda x: x[column_number]).\
-    map(lambda x: [x, base_type(x), semantic_type(x), 0]).\
-    map(lambda x: pass if x[0].lower() in column_list else getattr(current_module, sys.argv[2].lower())(x)).\
-    map(lambda x: '\t'.join())
+    map(lambda x: [x, base_type(x), semantic_type(x), 0]).filter(lambda x: x[0].lower() not in column_list).\
+    map(getattr(current_module, sys.argv[2].lower())).\
+    map(lambda x: '%s\t%s\t%s\t%s'%(x[0], x[1], x[2], x[3]))
     
-
     output.saveAsTextFile("%s/%s_%s.out"%(sys.argv[3], sys.argv[1].split('/')[-1].split('.')[0], sys.argv[2]))
     sc.stop()
