@@ -4,6 +4,8 @@ from operator import add
 import sys
 from datetime import datetime
 
+'''Run using command spark-submit by_location.py'''
+
 if __name__ == "__main__":
     sc = SparkContext()
     lines_g = sc.textFile('new_schema/green_*.csv')
@@ -18,6 +20,6 @@ if __name__ == "__main__":
 
     counts = counts_g.union(counts_y)
 
-    counts.saveAsTextFile('by_location_from_to.out')
+    counts.saveAsTextFile('by_borough.out')
 
     sc.stop()
