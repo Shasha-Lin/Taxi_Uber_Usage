@@ -76,7 +76,7 @@ def semantic_type(any_string):
         if value == 1:
             keys.append(key)
 
-    result = ", ".join(keys)
+    result = "/".join(keys)
     if result == '':
         return 'None'
     else:
