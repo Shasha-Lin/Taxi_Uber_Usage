@@ -17,13 +17,18 @@ The number, names, and order of columns are different in yellow and green files 
 ## Data Quality Issues
 Scripts for data quality investigation are in ./validation.
 <ol>
-<li>RequiredOutput.py is run by: "spark-submit RequiredOutput.py <file> <column> <output_directory>"
-where file should be any monthly green/yellow cab data files\n\
-            between 2015-01 and 2016-12\n\
-            column should be the exact name of the columnof interest: e.g. Pickup_longitude \n\
-            output directory is where you would like to see your output in the hdfs: e.g. user/sl4964"
-<\li>
-<\ol>
+<li>RequiredOutput.py outputs the base type, semantic type, valid/invalid/null for each value in a specified column in a specified monthly data file.<br/>
+It is run by: "spark-submit RequiredOutput.py &#60;file&#62; &#60;column&#62; &#60;output directory&#62;<br/>
+where file is any monthly green/yellow cab data files between 2015-01 and 2016-12<br/>
+column is the exact name of the columnof interest: e.g. Pickup_longitude<br/>
+output directory is where you would like to see your output in the hdfs: e.g. user/sl4964<br/>
+
+<p>&#42;This script handles any column name other than:<br/>
+tpep_pickup_datetime, lpep_pickup_datetime, tpep_dropoff_datetime, lpep_dropoff_datetime, PULocationID, DOLocationID, trip_distance/Trip_distance<br/>
+These columns are handled separately by other scripts in ./validation</p>
+</li>
+</ol>
+
 ## Data Summary
 Trips per Day and Trips per Month
 
