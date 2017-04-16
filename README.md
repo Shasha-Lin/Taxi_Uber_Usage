@@ -58,3 +58,28 @@ And run the code using this command:
 python trips_per_day_and_month_viz.py
 
 You should see Pickups_per_Day.png and Pickups_per_Month.png appear in the same directory.
+
+Trips by Borough
+
+The following pyspark code should be run using an HPC cluster such as NYU's Dumbo cluster:
+
++ by_location.py
+
+Run using the commands:  
++ spark-submit by_location.py
+
+This produces the following output files:  
+
++ by_borough.out
+
+Place each output file with the name unchanged in the same directory as the following visualization code:  
+
+by_borough_viz.py
+
+And run the code using this command:
+
+python by_borough_viz.py
+
+You should see heatmap_borough_all.png and heatmap_borough_exc_manhattan.png appear in the same directory.
+
+
