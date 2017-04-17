@@ -6,7 +6,7 @@ Our code analyzes all monthly files from 2015-2016 of the taxi dataset found her
 
 ## Data Folder Preparation
 
-<b> Data file directories for this group's code is accessible at /user/cer446/new_schema/ and /user/cer446/old_schema/ <\b>
+<b> Data file directories for this group's code is accessible at /user/cer446/new_schema/ and /user/cer446/old_schema/ <b>
 example: to access all yellow taxi data: '/user/cer446/new_schema/y*.csv,/user/cer446/old_schema/y*.csv'. These paths are the default file references for all our code in this repo. Alternatively you may recreate the file structure locally (below). 
 
 The number, names, and order of columns are different in yellow and green files from 2016-07 onwards. In order to run our unmodified code, please imitate our file structure as follows:
