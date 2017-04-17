@@ -22,8 +22,9 @@ output directory is where you would like to see your output in the hdfs: e.g. us
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("Usage: spark-submit RequiredOutput.py <file> <column> <output directory>\n file should be any monthly green/yellow cab data files\n\
-            between 2015-01 and 2016-12\n\
+        print("Usage: spark-submit RequiredOutput.py <files> <column> <output directory>\n files can either be any monthly green/yellow cab data files\n\
+            between 2015-01 and 2016-12, or wildcard expressions like /user/cer446/old_schema/yellow* \n\
+            If you use wildcards for multiple files, make sure yellow/green are in the expression\
             column should be the exact name of the columnof interest: e.g. Pickup_longitude \n\
             output directory is where you would like to see your output in the hdfs: e.g. user/sl4964", file=sys.stderr)
         exit(-1)
@@ -35,39 +36,69 @@ if __name__ == "__main__":
     'fare_amount', 'extra', 'mta_tax', 'payment_type',  'store_and_fwd_flag', 
     'tip_amount', 'tolls_amount', 'improvement_surcharge', 'total_amount', 'ehail_fee', 'trip_type']
 
-    #files = glob(sys.argv[1])
-    #if len(files) == 1
     watershed = datetime(2016, 7, 5, 0, 0)
     #In and after 2016-07, file schema changed. The day 5 is arbitrary, and should not matter. 
-    yg = sys.argv[1].split('/')[-1].split('_')[0]
-    month = sys.argv[1].split('/')[-1].split('_')[-1].split('.')[0].split('-')
-    file_time = file = datetime(int(month[0]), int(month[1]), 5)
+
     #Use different dictionary for data files with different schemas.
-    if yg == 'green':
-        if file_time < watershed:
-            column_dictionary = {'VendorID': 0, 'Pickup_longitude': 5, 'Pickup_latitude': 6, 'Dropoff_longitude': 7, 'Dropoff_latitude': 8, 
+    def dictinoary_green_old():
+        return {'VendorID': 0, 'Pickup_longitude': 5, 'Pickup_latitude': 6, 'Dropoff_longitude': 7, 'Dropoff_latitude': 8, 
             'Passenger_count': 9, 'Fare_amount': 11, 'Extra': 12, 'MTA_tax': 13, 'Tip_amount': 14, 'Tolls_amount':15, 'Ehail_fee':16, 
             'improvement_surcharge':17, 'Total_amount': 18, 'Payment_type': 19, 'Trip_type':20, 'RateCodeID': 4, 'Store_and_fwd_flag': 3}
-        else:
-            column_dictionary = {'VendorID': 0, 'lpep_pickup_datetime': 1, 'lpep_dropoff_datetime': 2, 'Store_and_fwd_flag':3, 
+
+    def dictinoary_green_new():
+        return {'VendorID': 0, 'lpep_pickup_datetime': 1, 'lpep_dropoff_datetime': 2, 'Store_and_fwd_flag':3, 
             'RatecodeID':4, 'PULocationID':5, 'DOLocationID':6, 'passenger_count':7, 'trip_distance':8, 'fare_amount':9, 
             'extra':10, 'mta_tax': 11, 'tip_amount': 12, 'tolls_amount': 13, 'ehail_fee': 14, 'improvement_surcharge':15, 
             'total_amount': 16, 'payment_type':17, 'trip_type': 18}
-    if yg == 'yellow':
-        if file_time < watershed:
-            column_dictionary = {'VendorID':0, 'tpep_pickup_datetime':1, 'tpep_dropoff_datetime':2, 'passenger_count':3, 
+
+    def dictionary_yellow_old():
+        return {'VendorID':0, 'tpep_pickup_datetime':1, 'tpep_dropoff_datetime':2, 'passenger_count':3, 
             'trip_distance':4, 'pickup_longitude':5,'pickup_latitude':6,'RateCodeID':7,'store_and_fwd_flag':8,'dropoff_longitude':9, 
             'dropoff_latitude':10,'payment_type':11,'fare_amount':12,'extra':13,'mta_tax':14,'tip_amount':15,'tolls_amount':16, 
              'improvement_surcharge':17, 'total_amount':18}
-        else:
-            column_dictionary = {'VendorID':0, 'tpep_pickup_datetime':1,'tpep_dropoff_datetime':2,'passenger_count':3, 
+    
+    def dictionary_yellow_new():
+        return {'VendorID':0, 'tpep_pickup_datetime':1,'tpep_dropoff_datetime':2,'passenger_count':3, 
             'trip_distance':4,'RatecodeID':5,'store_and_fwd_flag':6,'PULocationID':7,'DOLocationID':8,'payment_type':9, 
             'fare_amount':10,'extra':11,'mta_tax':12,'tip_amount':13,'tolls_amount':14,'improvement_surcharge':15, 'total_amount':16}
+    
+    files = glob(sys.argv[1])
+    if len(files) == 1:
+        yg = sys.argv[1].split('/')[-1].split('_')[0]
+        month = sys.argv[1].split('/')[-1].split('_')[-1].split('.')[0].split('-')
+        file_time = file = datetime(int(month[0]), int(month[1]), 5)
+        
+        if yg == 'green':
+            if file_time < watershed:
+                column_dictionary = dictinoary_green_old()
+            else:
+                column_dictionary = dictinoary_green_new()
+        if yg == 'yellow':
+            if file_time < watershed:
+                column_dictionary = dictionary_yellow_old()
+            else:
+                column_dictionary = dictionary_yellow_new()
+    else: #in case wildcards are used for multiple inputs.
+        if 'old_schema' and 'yellow' in sys.argv[1]:
+            column_dictionary = dictionary_yellow_old()
+        elif 'old_schema' and 'green' in sys.argv[1]:
+            column_dictionary = dictinoary_green_old()
+        elif 'new_schema' and 'yellow' in sys.argv[1]:
+            column_dictionary = dictinoary_yellow_new()
+        elif 'new_schema' and 'green' in sys.argv[1]:
+            column_dictionary = dictinoary_green_new()
+        else:
+            print("Usage: spark-submit RequiredOutput.py <files> <column> <output directory>\n files can either be any monthly green/yellow cab data files\n\
+            between 2015-01 and 2016-12, or wildcard expressions like /user/cer446/old_schema/yellow* \n\
+            If you use wildcards for multiple files, make sure yellow/green are in the expression\
+            column should be the exact name of the columnof interest: e.g. Pickup_longitude \n\
+            output directory is where you would like to see your output in the hdfs: e.g. user/sl4964", file=sys.stderr)
+            exit(-1)
 
     taxi_data = sc.textFile(sys.argv[1])
     column_name = sys.argv[2]
     column_number = column_dictionary[column_name]
-    missing = ['0', 'NULL', 'NaN', '', 'NAN', 'nan', 'None']
+    missing = ['0', 'NULL', 'NaN', '', 'NAN', 'nan', 'None', 'Unknown', 'unknown']
     ratecodeid_missing = ['99']
     def pickup_longitude(output):
         """generates output for Pickup_longitude"""
@@ -99,7 +130,7 @@ if __name__ == "__main__":
 
     def dropoff_longitude(output):
         """generates output for Dropoff_longitude"""
-        return Pickup_longitude(output)
+        return pickup_longitude(output)
 
     def dropoff_latitude(output):
         """generates output for Dropoff_latitude"""
@@ -131,7 +162,7 @@ if __name__ == "__main__":
 
     def payment_type(output):
 		'''generates output for Payment_type'''
-		return Passenger_count(output, rang = range(1, 7))
+		return passenger_count(output, rang = range(1, 7))
 
     def fare_amount(output):
     	'''generates output for Fare_amount'''
@@ -164,25 +195,25 @@ if __name__ == "__main__":
     	return output
 
     def mta_tax(output):
-    	return Extra(output, values = [.5])
+    	return extra(output, values = [.5])
 
     def improvement_surcharge(output):
-    	return Extra(output, values = [.3])
+    	return extra(output, values = [.3])
 
     def tip_amount(output):
-    	return Fare_amount(output)
+    	return fare_amount(output)
 
     def trip_type(output):
-    	return Passenger_count(output, rang = range(1, 3))
+    	return passenger_count(output, rang = range(1, 3))
 
     def ehail_fee(output):
-    	return Fare_amount(output)
+    	return fare_amount(output)
 
     def tolls_amount(output):
-    	return Fare_amount(output)
+    	return fare_amount(output)
 
     def total_amount(output):
-    	return Fare_amount(output)
+    	return fare_amount(output)
 
     def store_and_fwd_flag(output):
     	if output[0] in missing:
@@ -212,5 +243,8 @@ if __name__ == "__main__":
     map(getattr(current_module, sys.argv[2].lower())).\
     map(lambda x: '%s\t%s\t%s\t%s'%(x[0], x[1], x[2], x[3]))
     
-    output.saveAsTextFile("%s/%s_%s.out"%(sys.argv[3], sys.argv[1].split('/')[-1].split('.')[0], sys.argv[2]))
+    if len(files) == 1:
+        output.saveAsTextFile("%s/%s_%s.out"%(sys.argv[3], sys.argv[1].split('/')[-1].split('.')[0], sys.argv[2]))
+    else:
+        output.saveAsTextFile("%s/%s_%s_%s.out"%(sys.argv[3], sys.argv[1].split('/')[-2], sys.argv[1].split('/')[-1].split('*')[0], sys.argv[2]))
     sc.stop()
