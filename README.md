@@ -31,6 +31,18 @@ output directory is where you would like to see your output in the hdfs: e.g. us
 tpep_pickup_datetime, lpep_pickup_datetime, tpep_dropoff_datetime, lpep_dropoff_datetime, PULocationID, DOLocationID, trip_distance/Trip_distance<br/>
 These columns are handled separately by other scripts in ./validation</p>
 </li>
+<li>
+aggregation.py takes the output from RequiredOutput.py and counts the total number of each unique *base type + semantic type + validity type* combination. An example output file from aggregation.py looks like this:<br/>
+<p>Decimal,Distance/Currency/Lat/Long,VALID,212185502<br/>
+Integer,Count,NULL,3293115<br/>
+Decimal,Distance/Currency,VALID,37220<br/>
+Decimal,Distance/Currency,INVALID,1<br/>
+Integer,LowID/Count/LocationID,INVALID,3<br/>
+Decimal,Distance/Currency/Lat/Long,INVALID,3628<br/>
+Decimal,None,INVALID,3<br/>
+Decimal,Lat/Long,INVALID,37<br/>
+<p>&#42; "/" indicates an ambiguous semantic type, in which case the correct semantic type for each column is then inferred from the majority values.
+</li>
 </ol>
 
 ## Data Summary
