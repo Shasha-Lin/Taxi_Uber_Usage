@@ -5,6 +5,10 @@ Directory structure
 Our code analyzes all monthly files from 2015-2016 of the taxi dataset found here: http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml
 
 ## Data Folder Preparation
+
+<b> Data file directories for this group's code is accessible at /user/cer446/new_schema/ and /user/cer446/old_schema/ <\b>
+example: to access all yellow taxi data: '/user/cer446/new_schema/y*.csv,/user/cer446/old_schema/y*.csv'. These paths are the default file references for all our code in this repo. Alternatively you may recreate the file structure locally (below). 
+
 The number, names, and order of columns are different in yellow and green files from 2016-07 onwards. In order to run our unmodified code, please imitate our file structure as follows:
 
 1. Download all monthly files for yellow, green, and fhv taxis from 2015-01 through 2016-12
@@ -37,17 +41,23 @@ The following pyspark code should be run using an HPC cluster such as NYU's Dumb
 + by_date_pickup_fhv.py 
 + by_date_pickup_green.py 
 + by_date_pickup_yellow.py 
++ by_minute.py
++ nhbr_data_PySpark.py
 
 Run using the commands:  
 + spark-submit by_date_pickup_fhv.py 
 + spark-submit by_date_pickup_green.py 
 + spark-submit by_date_pickup_yellow.py 
++ spark-submit by_minute.py
++ spark-submit nhbr_data_PySpark.py
 
 This produces the following output files:  
 
 + by_date_pickup_fhv.out 
 + by_date_pickup_yellow.out 
 + by_date_pickup_green.out 
++ avg_tra_day.out 
++ yellow_2016
 
 Place each output file with the name unchanged in the same directory as the following visualization code:  
 
