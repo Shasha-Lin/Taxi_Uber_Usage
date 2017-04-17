@@ -7,11 +7,13 @@ and outputs a summary of number of values by unique combination of Basetype, Sem
 
 sc = SparkContext()
 
+name = sys.argv[1].split('/')[-1].split('.')[0]
+
 lines = sc.textFile(sys.argv[1], 1)
-lines = lines.map(lambda x: x.split(','))
+lines = lines.map(lambda x: x.split('\t'))
 results = lines.map(lambda x: ((x[1], x[2], x[3]), 1)).reduceByKey(add).\
 map(lambda x: (str(x[0][0]) + ',' + str(x[0][1]) + ',' + str(x[0][2]) + ',' + str(x[1])))
 
-results.saveAsTextFile("validation/%s_total.out"%(sys.argv[1]))
+results.saveAsTextFile("validation/%s_total.out"%(name))
 
 sc.stop()

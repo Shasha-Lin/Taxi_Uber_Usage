@@ -6,10 +6,10 @@ Our code analyzes all monthly files from 2015-2016 of the taxi dataset found her
 
 ## Data Folder Preparation
 
-<b> Data file directories for this group's code is accessible on hadoop fs at /user/cer446/new_schema/ and /user/cer446/old_schema/ </b> Old_schema dir includes Yellow/Green/FHV data from 2015 until 2016 June. New schema dir includes Yellow/Green/FHV data from 2016 July until 2017.
-Example: to access all yellow taxi data, '/user/cer446/new_schema/y*.csv,/user/cer446/old_schema/y*.csv'. These paths are the default file references for all our code in this repo. Alternatively you may recreate the file structure locally (below). 
+<b> Data file directories for this group's code is accessible on hadoop fs at /user/cer446/new_schema/ and /user/cer446/old_schema/ </b> <p>Old_schema dir includes Yellow/Green/FHV data from 2015 until 2016 June. <br/>New schema dir includes Yellow/Green/FHV data from 2016 July until 2017.<br/>
+For example, use '/user/cer446/new_schema/yellow*.csv,/user/cer446/old_schema/yellow*.csv' to access all yellow taxi data from 2015-01 to 2016-12. These paths are the default file references for all our code in this repo. Alternatively you may recreate the file structure locally (details below). <br/>
 
-The number, names, and order of columns are different in yellow and green files from 2016-07 onwards. In order to run our unmodified code, please imitate our file structure as follows:
+The number, names, and order of columns are different in yellow and green files from 2016-07 onwards. In order to run our unmodified code, please imitate our file structure as follows:<br/>
 
 1. Download all monthly files for yellow, green, and fhv taxis from 2015-01 through 2016-12
 2. Don't change the file names. If you do change the file names, keep "yellow_" "green_" or "fhv_" as the first part of each file name.
@@ -30,6 +30,18 @@ output directory is where you would like to see your output in the hdfs: e.g. us
 <p>&#42;This script handles any column name other than:<br/>
 tpep_pickup_datetime, lpep_pickup_datetime, tpep_dropoff_datetime, lpep_dropoff_datetime, PULocationID, DOLocationID, trip_distance/Trip_distance<br/>
 These columns are handled separately by other scripts in ./validation</p>
+</li>
+<li>
+aggregation.py takes the output from RequiredOutput.py and counts the total number of each unique *base type + semantic type + validity type* combination. An example output file from aggregation.py looks like this:<br/>
+<p>Decimal,Distance/Currency/Lat/Long,VALID,212185502<br/>
+Integer,Count,NULL,3293115<br/>
+Decimal,Distance/Currency,VALID,37220<br/>
+Decimal,Distance/Currency,INVALID,1<br/>
+Integer,LowID/Count/LocationID,INVALID,3<br/>
+Decimal,Distance/Currency/Lat/Long,INVALID,3628<br/>
+Decimal,None,INVALID,3<br/>
+Decimal,Lat/Long,INVALID,37<br/>
+<p>&#42; "/" indicates an ambiguous semantic type, in which case the correct semantic type for each column is then inferred from the majority values.
 </li>
 </ol>
 
