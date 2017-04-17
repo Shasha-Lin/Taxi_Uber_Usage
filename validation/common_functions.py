@@ -51,7 +51,7 @@ def semantic_type(any_string):
         types['Lat/Long'] = 1
     
     #Check to see if it's a 2-pt. positive decimal
-    decimal2 = re.compile('[0-9]+\.[0-9]{1,2}')
+    decimal2 = re.compile('[0-9]*\.[0-9]{1,2}')
     decimal2_match = decimal2.match(any_string)
     if decimal2_match:
         types['Currency'] = 1

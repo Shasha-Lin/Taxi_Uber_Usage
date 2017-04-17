@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     def dropoff_latitude(output):
         """generates output for Dropoff_latitude"""
-        return Pickup_latitude(output)
+        return pickup_latitude(output)
 
     def vendorid(output):
     	"""generates output for VendorID"""
@@ -148,7 +148,7 @@ if __name__ == "__main__":
 			output[-1] = 'INVALID'
         return output 
 
-	def passenger_count(output, rang = range(1, 10)):
+    def passenger_count(output, rang = range(1, 10)):
 		'''generates output for Passenger_count'''
 		try:
 			output[0] = int(output[0])
