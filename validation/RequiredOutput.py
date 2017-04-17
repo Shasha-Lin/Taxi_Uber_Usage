@@ -238,7 +238,8 @@ if __name__ == "__main__":
         return output
 
 
-    output = taxi_data.mapPartitions(lambda x: reader(x)).map(lambda x: x[column_number]).\
+    output = taxi_data.mapPartitions(lambda x: reader(x)).filter(lambda x: len(x) >= len(column_dictionary)).\
+    map(lambda x: x[column_number]).\
     map(lambda x: [x, base_type(x), semantic_type(x), 0]).filter(lambda x: x[0].lower() not in column_list).\
     map(getattr(current_module, sys.argv[2].lower())).\
     map(lambda x: '%s\t%s\t%s\t%s'%(x[0], x[1], x[2], x[3]))
