@@ -44,92 +44,100 @@ if __name__ == "__main__":
 
 
     def pulocationid(value):
-        if 'LocationID' in semantic_type(value):
-            if int(value) in (264, 265):
-                return 'MISSING'
+        if 'LocationID' in semantic_type(value[0]):
+            if int(value[0]) in (264, 265):
+                value[-1] = 'MISSING'
             else:
-                return 'VALID'
-        elif value in missing:
-            return 'MISSING'
+                value[-1] = 'VALID'
+        elif value[0] in missing:
+            value[-1] = 'MISSING'
         else:
-            return 'INVALID\OUTLIER'
+            value[-1] = 'INVALID\OUTLIER'
+        return value
+
 
     def dolocationid(value):
-        if 'LocationID' in semantic_type(value):
-            if int(value) in (264, 265):
-                return 'MISSING'
+        if 'LocationID' in semantic_type(value[0]):
+            if int(value[0]) in (264, 265):
+                value[-1] = 'MISSING'
             else:
-                return 'VALID'
-        elif value in missing:
-            return 'MISSING'
+                value[-1] = 'VALID'
+        elif value[0] in missing:
+            value[-1] = 'MISSING'
         else:
-            return 'INVALID\OUTLIER'
+            value[-1] = 'INVALID\OUTLIER'
+        return value
 
-    def lpep_pickup_datetime(date):
+    def lpep_pickup_datetime(value):
         try:
-            date_parsed = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-            if date_parsed.year in (2015, 2016):
-                return 'VALID'
+            value_parsed = datetime.strptime(value[0], '%Y-%m-%d %H:%M:%S')
+            if value_parsed.year in (2015, 2016):
+                value[-1] = 'VALID'
             else:
-                return 'INVALID\OUTLIER'
+                value[-1] = 'INVALID\OUTLIER'
         except ValueError:
-            if date in missing:
-                return 'MISSING'
+            if value[0] in missing:
+                value[-1] = 'MISSING'
             else:
-                return 'INVALID\OUTLIER'
+                value[-1] = 'INVALID\OUTLIER'
+        return value
 
-    def tpep_pickup_datetime(date):
+    def tpep_pickup_datetime(value):
         try:
-            date_parsed = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-            if date_parsed.year in (2015, 2016):
-                return 'VALID'
+            value_parsed = datetime.strptime(value[0], '%Y-%m-%d %H:%M:%S')
+            if value_parsed.year in (2015, 2016):
+                value[-1] = 'VALID'
             else:
-                return 'INVALID\OUTLIER'
+                value[-1] = 'INVALID\OUTLIER'
         except ValueError:
-            if date in missing:
-                return 'MISSING'
+            if value[0] in missing:
+                value[-1] = 'MISSING'
             else:
-                return 'INVALID\OUTLIER'
+                value[-1] = 'INVALID\OUTLIER'
+        return value
 
-    def lpep_dropoff_datetime(date):
+    def lpep_dropoff_datetime(value):
         try:
-            date_parsed = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-            if date_parsed.year in (2015, 2016):
-                return 'VALID'
+            value_parsed = datetime.strptime(value[0], '%Y-%m-%d %H:%M:%S')
+            if value_parsed.year in (2015, 2016):
+                value[-1] = 'VALID'
             else:
-                return 'INVALID\OUTLIER'
+                value[-1] = 'INVALID\OUTLIER'
         except ValueError:
-            if date in missing:
-                return 'MISSING'
+            if date[0] in missing:
+                value[-1] = 'MISSING'
             else:
-                return 'INVALID\OUTLIER'
+                value[-1] = 'INVALID\OUTLIER'
+        return value
 
-    def tpep_dropoff_datetime(date):
+    def tpep_dropoff_datetime(value):
         try:
-            date_parsed = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-            if date_parsed.year in (2015, 2016):
-                return 'VALID'
+            value_parsed = datetime.strptime(value[0], '%Y-%m-%d %H:%M:%S')
+            if value_parsed.year in (2015, 2016):
+                value[-1] = 'VALID'
             else:
-                return 'INVALID\OUTLIER'
+                value[-1] = 'INVALID\OUTLIER'
         except ValueError:
-            if date in missing:
-                return 'MISSING'
+            if value[0] in missing:
+                value[-1] = 'MISSING'
             else:
-                return 'INVALID\OUTLIER'
+                value[-1] = 'INVALID\OUTLIER'
+        return value
 
     def trip_distance(value):
-        if 'Distance' in semantic_type(value):
-            if float(value) > 0:
-                return 'VALID'
-            else:
-                return 'MISSING'
+        if 'Distance' in semantic_type(value[0]):
+            if float(value[0]) < 100 and float(value[0]) > 0:
+                value[-1] = 'VALID'
+            elif float(value[0]) == 0:
+                value[-1] = 'MISSING'
+            elif 100 < float(value[0]):
+                value[-1] = 'INVALID\OUTLIER'
         else:
             if value in missing:
-                return 'MISSING'
+                value[-1] = 'MISSING'
             else:
-                return 'INVALID\OUTLIER'
-
-
+                value[-1] = 'INVALID\OUTLIER'
+        return value
 
     missing = ['0', 'NULL', 'NaN', '', 'NAN', 'nan', 'None', 'none', 'Unknown', 'unknown']
 
@@ -163,10 +171,15 @@ if __name__ == "__main__":
         if sys.argv[1] == 'green':
             taxi_data_old = sc.textFile('/user/cerr6/old_schema/green_*.csv')
 
-        output_old = taxi_data_old.mapPartitions(lambda x: reader(x)).map(lambda x: x[old_column_number]).\
-        map(lambda x: [x, base_type(x), semantic_type(x), 0]).filter(lambda x: x[0].lower() not in column_list).\
+
+
+        output_old = taxi_data_old.mapPartitions(lambda x: reader(x)).filter(lambda x: len(x) >= (old_column_number + 1)).map(lambda x: x[old_column_number]).\
+        map(lambda x: [x, base_type(str(x)), semantic_type(str(x)), 0])
+        output_old = output_old.filter(lambda x: x[0].lower() not in column_list).\
         map(getattr(current_module, sys.argv[2].lower())).\
-        map(lambda x: str(x[0]) + ',' + str(x[1]) + ',' + str(x[2]) + ',' + str(x[3]))
+        map(lambda x: str(x[0]) + '\t' + str(x[1]) + '\t' + str(x[2]) + '\t' + str(x[3]))
+
+        
 
     if new_column_number >= 0:
         if sys.argv[1] == 'yellow':
@@ -174,10 +187,11 @@ if __name__ == "__main__":
         if sys.argv[1] == 'green':
             taxi_data_new = sc.textFile('/user/cer446/new_schema/green_*.csv')
 
-        output_new = taxi_data_new.mapPartitions(lambda x: reader(x)).map(lambda x: x[new_column_number]).\
-        map(lambda x: [x, base_type(x), semantic_type(x), 0]).filter(lambda x: x[0].lower() not in column_list).\
+        output_new = taxi_data_new.mapPartitions(lambda x: reader(x)).filter(lambda x: len(x) >= (new_column_number + 1)).map(lambda x: x[new_column_number]).\
+        map(lambda x: [x, base_type(str(x)), semantic_type(str(x)), 0])
+        output_new = output_new.filter(lambda x: x[0].lower() not in column_list).\
         map(getattr(current_module, sys.argv[2].lower())).\
-        map(lambda x: str(x[0]) + ',' + str(x[1]) + ',' + str(x[2]) + ',' + str(x[3]))
+        map(lambda x: str(x[0]) + '\t' + str(x[1]) + '\t' + str(x[2]) + '\t' + str(x[3]))
 
     if old_column_number >= 0 and new_column_number >=0:
         results = output_old.union(output_new) #if both results exist, union them
