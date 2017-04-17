@@ -24,8 +24,8 @@ if __name__ == "__main__":
     current_module = sys.modules[__name__] #used to fetch the correct function
     column_list = ['pulocationid','dolocationid','lpep_pickup_datetime', 'tpep_pickup_datetime','lpep_dropoff_datetime','tpep_dropoff_datetime','trip_distance']
 
-    old_green= {'VendorID': 0, 'lpep_pickup_datetime:':1, 'Lpep_dropoff_datetime':2, 'Pickup_longitude': 5, 'Pickup_latitude': 6, 'Dropoff_longitude': 7, 'Dropoff_latitude': 8, 
-            'Passenger_count': 9, 'Trip_distance': 10, 'Fare_amount': 11, 'Extra': 12, 'MTA_tax': 13, 'Tip_amount': 14, 'Tolls_amount':15, 'Ehail_fee':16, 
+    old_green= {'VendorID': 0, 'lpep_pickup_datetime:':1, 'lpep_dropoff_datetime':2, 'Pickup_longitude': 5, 'Pickup_latitude': 6, 'Dropoff_longitude': 7, 'Dropoff_latitude': 8, 
+            'Passenger_count': 9, 'trip_distance': 10, 'Fare_amount': 11, 'Extra': 12, 'MTA_tax': 13, 'Tip_amount': 14, 'Tolls_amount':15, 'Ehail_fee':16, 
             'improvement_surcharge':17, 'Total_amount': 18, 'Payment_type': 19, 'Trip_type':20, 'RateCodeID': 4, 'Store_and_fwd_flag': 3}
 
     new_green = {'VendorID': 0, 'lpep_pickup_datetime': 1, 'lpep_dropoff_datetime': 2, 'Store_and_fwd_flag':3, 
@@ -169,17 +169,13 @@ if __name__ == "__main__":
         if sys.argv[1] == 'yellow':
             taxi_data_old = sc.textFile('/user/cer446/old_schema/yellow_*.csv')
         if sys.argv[1] == 'green':
-            taxi_data_old = sc.textFile('/user/cerr6/old_schema/green_*.csv')
-
-
+            taxi_data_old = sc.textFile('/user/cer446/old_schema/green_*.csv')
 
         output_old = taxi_data_old.mapPartitions(lambda x: reader(x)).filter(lambda x: len(x) >= (old_column_number + 1)).map(lambda x: x[old_column_number]).\
         map(lambda x: [x, base_type(str(x)), semantic_type(str(x)), 0])
         output_old = output_old.filter(lambda x: x[0].lower() not in column_list).\
         map(getattr(current_module, sys.argv[2].lower())).\
         map(lambda x: str(x[0]) + '\t' + str(x[1]) + '\t' + str(x[2]) + '\t' + str(x[3]))
-
-        
 
     if new_column_number >= 0:
         if sys.argv[1] == 'yellow':
