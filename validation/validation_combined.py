@@ -29,7 +29,7 @@ if __name__ == "__main__":
     'tip_amount', 'tolls_amount', 'improvement_surcharge', 'total_amount', 'ehail_fee', 'trip_type']
 
     old_green= {'VendorID': 0, 'lpep_pickup_datetime:':1, 'lpep_dropoff_datetime':2, 'pickup_longitude': 5, 'pickup_latitude': 6, 'dropoff_longitude': 7, 'dropoff_latitude': 8, 
-            'passenger_count': 9, 'trip_distance': 10, 'fare_amount': 11, 'extra': 12, 'MTA_tax': 13, 'tip_amount': 14, 'tolls_amount':15, 'ehail_fee':16, 
+            'passenger_count': 9, 'trip_distance': 10, 'fare_amount': 11, 'extra': 12, 'mta_tax': 13, 'tip_amount': 14, 'tolls_amount':15, 'ehail_fee':16, 
             'improvement_surcharge':17, 'total_amount': 18, 'payment_type': 19, 'trip_type':20, 'RateCodeID': 4, 'store_and_fwd_flag': 3}
 
     new_green = {'VendorID': 0, 'lpep_pickup_datetime': 1, 'lpep_dropoff_datetime': 2, 'store_and_fwd_flag':3, 
