@@ -6,7 +6,7 @@ Our code analyzes all monthly files from 2015-2016 of the taxi dataset found her
 
 ## Data Folder Preparation
 
-<b> Data file directories for this group's code is accessible on hadoop fs at /user/cer446/new_schema/ and /user/cer446/old_schema/ </b> <p>Old_schema dir includes Yellow/Green/FHV data from 2015 until 2016 June. <br/>New schema dir includes Yellow/Green/FHV data from 2016 July until 2017.<br/>
+<b> Data file directories for this group's code is accessible on hadoop fs at /user/cer446/new_schema/ and /user/cer446/old_schema/ </b> <p>Old_schema dir includes Yellow/Green data from 2015 until 2016 June. <br/>New schema dir includes Yellow/Green data from 2016 July until 2017. FHV data is at the main level of the directory.<br/>
 For example, use '/user/cer446/new_schema/yellow*.csv,/user/cer446/old_schema/yellow*.csv' to access all yellow taxi data from 2015-01 to 2016-12. These paths are the default file references for all our code in this repo. Alternatively you may recreate the file structure locally (details below). <br/>
 
 The number, names, and order of columns are different in yellow and green files from 2016-07 onwards. In order to run our unmodified code, please imitate our file structure as follows:<br/>
