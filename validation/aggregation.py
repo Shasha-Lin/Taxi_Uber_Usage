@@ -12,8 +12,9 @@ name = sys.argv[1].split('/')[-1].split('.')[0]
 lines = sc.textFile(sys.argv[1], 1)
 lines = lines.map(lambda x: x.split('\t'))
 results = lines.map(lambda x: ((x[1], x[2], x[3]), 1)).reduceByKey(add).\
-map(lambda x: (str(x[0][0]) + ',' + str(x[0][1]) + ',' + str(x[0][2]) + ',' + str(x[1])))
+map(lambda x: (name + ',' + str(x[0][0]) + ',' + str(x[0][1]) + ',' + str(x[0][2]) + ',' + str(x[1])))
+#added name so that we can concatenate all the files and still have the total results
 
-results.saveAsTextFile("validation/%s_total.out"%(name))
+results.saveAsTextFile("aggregation/total_%s.out"%(name)) #was "aggregation/%s_total.out"%(name)
 
 sc.stop()
