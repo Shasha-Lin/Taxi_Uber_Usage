@@ -4,7 +4,7 @@ import os
 
 ''''Change directory_name to place where results of aggregation.py are stored.'''
 
-directory_name = '/Users/carolineroper/Documents/Big Data/all_validation_results_green/'
+directory_name = '/Users/carolineroper/Documents/Big Data/all_validation_results_final/'
 
 list_files = os.listdir(directory_name)
 
@@ -39,7 +39,7 @@ print(types.to_latex(longtable=True))
 
 #Pivots data by "valid/invalid/null"
 
-validity = pd.pivot_table(total_results, index = 'column_name', columns = ['validity']).fillna(0)
+validity = pd.pivot_table(total_results, index = 'column_name', columns = ['validity'], aggfunc='sum').fillna(0)
 validity.reset_index(inplace=True)
 validity.columns = validity.columns.droplevel()
 validity.columns = ['Column Name', 'Invalid', 'Null', 'Valid']
