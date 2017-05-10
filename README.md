@@ -21,18 +21,15 @@ The number, names, and order of columns are different in yellow and green files 
 ## Data Quality Issues
 Scripts for data quality investigation are in ./validation.
 <ol>
-<li>RequiredOutput.py outputs the base type, semantic type, valid/invalid/null for each value in a specified column in a specified monthly data file.<br/>
-It is run by: "spark-submit RequiredOutput.py &#60;file&#62; &#60;column&#62; &#60;output directory&#62;<br/>
-where file is any monthly green/yellow cab data files between 2015-01 and 2016-12<br/>
-column is the exact name of the columnof interest: e.g. Pickup_longitude<br/>
+<li>validation_combined.py outputs the base type, semantic type, valid/invalid/null for each value in a specified column in a specified monthly data file.<br/>
+It is run by: "spark-submit validation_combined.py &#60;color&#62; &#60;column&#62; &#60;output directory&#62;<br/>
+where color is green or yellow<br/>
+column is the lowercase name of the columnof interest: e.g. pickup_longitude<br/>
 output directory is where you would like to see your output in the hdfs: e.g. user/sl4964<br/>
 
-<p>&#42;This script handles any column name other than:<br/>
-tpep_pickup_datetime, lpep_pickup_datetime, tpep_dropoff_datetime, lpep_dropoff_datetime, PULocationID, DOLocationID, trip_distance/Trip_distance<br/>
-These columns are handled separately by other scripts in ./validation</p>
-</li>
+
 <li>
-aggregation.py takes the output from RequiredOutput.py and counts the total number of each unique *base type + semantic type + validity type* combination. An example output file from aggregation.py looks like this:<br/>
+aggregation.py takes the output from validation_combined.py and counts the total number of each unique *base type + semantic type + validity type* combination. An example output file from aggregation.py looks like this:<br/>
 <p>Decimal,Distance/Currency/Lat/Long,VALID,212185502<br/>
 Integer,Count,NULL,3293115<br/>
 Decimal,Distance/Currency,VALID,37220<br/>
@@ -42,6 +39,12 @@ Decimal,Distance/Currency/Lat/Long,INVALID,3628<br/>
 Decimal,None,INVALID,3<br/>
 Decimal,Lat/Long,INVALID,37<br/>
 <p>&#42; "/" indicates an ambiguous semantic type, in which case the correct semantic type for each column is then inferred from the majority values.
+
+<li>
+validation_green_all_cols.sh and validation_yellow_all_cols.sh run validation_combined.py and aggregation.py for each column in the data to generate all the relevant output.
+
+<li>
+format_validation_results.py formats the final output produced by running all the scripts as specified in validation_green_all_cols.sh and validation_yellow_all_cols.sh. The script combines the separate .out files into one and produces totals formatted for latek.
 </li>
 </ol>
 
@@ -101,4 +104,30 @@ python by_borough_viz.py
 
 You should see heatmap_borough_all.png and heatmap_borough_exc_manhattan.png appear in the same directory.
 
+## Data Exploration
 
+Trips per Day and Month, Citi Bike included.
+
+The citi bike data can be downloaded here: https://www.citibikenyc.com/system-data
+
+It is also saved on Dumbo in /user/cer446/citibike/
+
+In addition to previous spark scripts for the taxi data, run the following spark script for the citibike data:
+
+by_date_citibike.py
+
+Run using the command: spark-submit by_date_citibike.py
+
+And run the following python script to aggregate and visualize results:
+
+trips_per_day_and_month_viz_part2.py
+
+Place the output file with the name unchanged in the same directory as the following visualization code:  
+
+python trips_per_day_and_month_viz_part2.py
+
+And run the code using this command:
+
+python trips_per_day_and_month_viz_part2.py
+
+You should see Trips_Per_Month_all.png and Trips_Over_Time_Transportation_Method.png appear in the same directory.
