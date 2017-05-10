@@ -131,3 +131,7 @@ And run the code using this command:
 python trips_per_day_and_month_viz_part2.py
 
 You should see Trips_Per_Month_all.png and Trips_Over_Time_Transportation_Method.png appear in the same directory.
+
+For the pickup location comparison, run spark scripts pickup_long_lat_citi.py and pickup_by_long_lat.py
+
+The ipynb file Scatterplot+Cab+Locations.ipynb creates the scatterplot of top pickup locations for citi bike and cabs.
