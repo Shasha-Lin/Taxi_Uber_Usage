@@ -7,3 +7,6 @@ from 'http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml'
 AND
 
 'nhbr_data2.csv', the output from nhbr_data_PySpark.py
+
+tip.py also requires 'taxi+_zone_lookup.csv' AND
+'trip_cost.csv', the output from nhbr_data_PySpark.py (in the second RDD map function, replace '$' with 'fare' and 'passenger' with 'tip')
