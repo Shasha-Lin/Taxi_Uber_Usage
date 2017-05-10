@@ -45,7 +45,7 @@ def semantic_type(any_string):
         types['PO/DO Datetime'] = 1
     
     #Check to see if it's a latitude or longitude (6 digits, positive or negative)
-    decimal6 = re.compile('^-?\d*\.[0-9]{6,}')
+    decimal6 = re.compile('^-?\d*\.[0-9]{3,}')
     decimal6_match = decimal6.match(any_string)
     if decimal6_match:
         types['Lat/Long'] = 1
